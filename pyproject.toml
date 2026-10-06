@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "olaytara"
+version = "0.1.0"
+description = "Gercek dunya AI guvenligi olayi iddia denetcisi - kanit duzleminde tutarlilik kontrolu"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Arda Mecik" }]
+keywords = [
+    "ai-security",
+    "llm-security",
+    "incident-response",
+    "evidence",
+    "knowledge-base",
+    "turkce",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+]
+
+[project.scripts]
+olaytara = "olaytara.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/mecik-arda/olaytara"
+Issues = "https://github.com/mecik-arda/olaytara/issues"
+
+[tool.setuptools]
+packages = ["olaytara"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["B008"]
