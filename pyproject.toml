@@ -35,6 +35,11 @@ classifiers = [
 [project.scripts]
 olaytara = "olaytara.cli:main"
 
+[project.optional-dependencies]
+test = [
+    "ruff>=0.6",
+]
+
 [project.urls]
 Homepage = "https://github.com/mecik-arda/olaytara"
 Issues = "https://github.com/mecik-arda/olaytara/issues"
