@@ -214,13 +214,8 @@ def filtrele(sonuclar: list[Sonuc], esik: Onem) -> list[Sonuc]:
     return out
 
 
-_Urun_RE = re.compile(r"[A-Z][A-Za-z0-9.]{2,}")
 _Surum_RE = re.compile(r"[<>=]?\s*\d+\.\d+")
 _Yama_RE = re.compile(r"(yamaland|yamalad|patched|fixed|düzelt)", re.IGNORECASE)
-
-
-def re_urun_adı(metin: str) -> bool:
-    return bool(_Urun_RE.search(metin))
 
 
 def re_sürüm(metin: str) -> bool:
