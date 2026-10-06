@@ -13,7 +13,6 @@ from . import sozlesme as s
 from .kurallar import KURALLAR_IDX
 from .modeller import Bulgu, Girinti, Onem, Sonuc
 
-# Taranmayacak dizinler — aynı sözleşme awesome-ai-security-tr ile uyumlu.
 ATLANACAK = frozenset({
     ".git", ".venv", "venv", "node_modules", "__pycache__",
     ".pytest_cache", ".ruff_cache", "build", "dist",
@@ -113,15 +112,15 @@ def _girdi_kurallari(g: Girinti) -> list[Bulgu]:
     """Sözleşmeye uyan bir girdiye ONA03–ONA07 kurallarını uygular."""
     bulgular: list[Bulgu] = []
 
-    kimlikler = [k for k, rx in s.KIMLIK_RE.items() if rx.search(g.ad)]
-    urun_adi_var = bool(
-        re_urun_adı(g.ad) or re_sürüm(g.ad) or re_sürüm(g.aciklama)
+    kimlik_var = any(rx.search(g.ad) or rx.search(g.aciklama) for rx in s.KIMLIK_RE.values())
+    surum_beyani = bool(
+        s.SURUM_ARALIGI_RE.search(g.aciklama) or s.YAMA_RE.search(g.aciklama)
     )
-    if urun_adi_var and not kimlikler:
+    if surum_beyani and not kimlik_var:
         bulgular.append(Bulgu(
             kural=KURALLAR_IDX["ONA04"],
             girinti=g,
-            kanit="ürün/sürüm geçiyor, CVE/GHSA/CWE yok",
+            kanit="sürüm/yama beyanı var, CVE/GHSA/CWE yok",
             guven="orta",
         ))
 
@@ -136,9 +135,6 @@ def _girdi_kurallari(g: Girinti) -> list[Bulgu]:
         ))
 
     if not (s.ISTISMAR_RE.search(g.aciklama) or s.ISTISMAR_YOK_RE.search(g.aciklama)):
-        # Durum hiç yazılmamışsa bu bir çelişki değildir — gürültü üretmemek
-        # için ONA03 burada tetiklenmez. Ancak metin olasılık diliyle
-        # gerçeklik iddiası kuruyorsa yine de raporlanır.
         if s.OLASILIK_RE.search(g.aciklama):
             bulgular.append(Bulgu(
                 kural=KURALLAR_IDX["ONA03"],

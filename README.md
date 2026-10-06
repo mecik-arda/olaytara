@@ -23,8 +23,8 @@ kimliği, sürümü, kanıtı ve istismar durumu tutarlı mı?
   tür/dil etiketi
 - **Kanıt ayrımı (ONA03)** — "zafiyet bulundu" ile "üretimde istismar edildi"
   birbirine karışmış mı
-- **İzlenebilirlik (ONA04–ONA05)** — CVE/GHSA/CWE kimliği ve etkilenen sürüm
-  aralığı var mı
+- **İzlenebilirlik (ONA04–ONA05)** — sürüm/yama beyanı olup takip kimliği
+  (CVE/GHSA/CWE) taşımayan kayıtlar, belirtilmemiş sürüm aralıkları
 - **Çapraz doğrulama (ONA06)** — kayıt tek kaynaklı mı
 - **Dizin hijyeni (ONA07–ONA08)** — açıklama uzunluğu, bölüm başına kaynak sayısı
 - **Maskelenmiş kanıt** — URL yolları ve serbest metinli kanıt parçaları rapora
@@ -79,10 +79,12 @@ Eşik: orta (altındaki bulgular gizlendi).
          bunu açıkça yazın ('keşfedildi, istismar edilmedi'); istismar varsa veri
          sızdırma, etkilenen sürüm veya kayıt numarası verin.
 
-[Yüksek] 10-gercek-dunya-olaylari.md:15 ONA04: Kimliksiz zafiyet kaydı
-  Kanıt: ürün/sürüm geçiyor, CVE/GHSA/CWE yok
+[Yüksek] 10-gercek-dunya-olaylari.md:15 ONA04: Sürüm beyanı var ama takip kimliği yok
+  Kanıt: sürüm/yama beyanı var, CVE/GHSA/CWE yok
   Güven: orta
-  Öneri: Girdiye kimlik ekleyin: (CVE-2026-12345) veya (GHSA-xxxx-xxxx-xxxx).
+  Öneri: Girdiye takip kimliği ekleyin: (CVE-2026-12345) veya (GHSA-xxxx-xxxx-xxxx).
+         Kimlik yoksa bu kayıt bir zafiyet değil, olay kaydıdır; o durumda sürüm
+         beyanını da kaldırın.
 Risk eşiğine ulaşıldı.
 ```
 
@@ -115,7 +117,7 @@ listesiyle aynıdır; olaytara o listenin kanıt düzlemindeki eksiğini kapatı
 | **ONA01** | Girdi sözleşmesine uymayan satır (ayırıcı, etiket, girinti) | Yüksek |
 | **ONA02** | Bağlantısız çıplak URL | Yüksek |
 | **ONA03** | Zafiyet ve istismar iddiası karıştırılmış | Kritik |
-| **ONA04** | Ürün/sürüm geçen ama CVE/GHSA/CWE taşımayan kayıt | Orta |
+| **ONA04** | Sürüm/yama beyanı var ama CVE/GHSA/CWE yok | Orta |
 | **ONA05** | Sürüm aralığı belirtilmemiş | Orta |
 | **ONA06** | Çapraz doğrulama kaynağı yok (NVD/OSV/advisory) | Düşük |
 | **ONA07** | Açıklama çok kısa (<80) veya çok uzun (>900) | Düşük |
@@ -184,8 +186,22 @@ python -m unittest discover -s tests -v
 ruff check .
 ```
 
-31 test: her ONA kuralı için en az bir test, örnek dosyaların kural tablosunu
-gerçekten tutturduğunu doğrulayan regresyon testleri ve çıkış kodu sözleşmesi.
+34 test: her ONA kuralı için en az bir test, kural tasarımının gürültü
+ölçümüyle doğrulandığı regresyon testleri, örnek dosyaların kural tablosunu
+gerçekten tutturduğu denetimler ve çıkış kodu sözleşmesi.
+
+**Kural gürültüsü ölçümü.** Kurallar mevcut kaynak listelerindeki gerçek
+girdilerde sınandı. ONA04 ilk haliyle "ürün adı geçiyor" diye tetikleniyordu ve
+18 girdinin 13'ünde yanlış pozitif üretiyordu — Air Canada gibi hukuki vaka
+kayıtlarının CVE taşımaması bir eksiklik değil. Kural, sürüm veya yama
+beyanı **olduğunda** devreye giracak şekilde daraltıldı: 3/18, ve üçü de
+gerçekten aksiyon alınabilir.
+
+**Kaynak: 10. bölüm, 18 girdi**
+
+```
+ONA03 1   ONA04 3   ONA05 2   ONA08 2
+```
 
 ---
 

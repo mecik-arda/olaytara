@@ -57,15 +57,17 @@ KURALLAR: tuple[Kural, ...] = (
     ),
     Kural(
         kimlik="ONA04",
-        ad="Kimliksiz zafiyet kaydı",
+        ad="Sürüm beyanı var ama takip kimliği yok",
         onem=Onem.ORTA,
         aciklama=(
-            "Ürün adı geçen ancak CVE, GHSA veya CWE taşımayan girdi, takip edilemez. "
-            "Bu kimlikler olmadan yamalama durumu ve etkilenen sürümler izlenemez."
+            "Girdi etkilenen sürümü ya da yama durumunu belirtiyor ama CVE/GHSA/CWE "
+            "taşımıyor. Okuyucu 'kendi sürümüm etkileniyor mu' sorusunu "
+            "kimlikle cevaplayamaz."
         ),
         oneriler=(
-            "Girdiye kimlik ekleyin: (CVE-2026-12345) veya (GHSA-xxxx-xxxx-xxxx). "
-            "Kimlik bulunamıyorsa girdiyi kaynak listesine almak yerine not olarak tutun."
+            "Girdiye takip kimliği ekleyin: (CVE-2026-12345) veya "
+            "(GHSA-xxxx-xxxx-xxxx). Kimlik yoksa bu kayıt bir zafiyet değil, "
+            "olay kaydıdır; o durumda sürüm beyanını da kaldırın."
         ),
     ),
     Kural(

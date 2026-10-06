@@ -18,8 +18,6 @@ GECERLI = (
     "1.2.3 ve 1.3.0 arasındaydı, üretimde istismar edildi. *(tür: araştırma, dil: EN)*"
 )
 
-# Sözleşmeye uyan bir girdinin üç biçimli varyantı. Testler ayırıcıyı
-# değiştirdiğinde hangi "—" değiştiğini bilmemesi gerektiği için üretilir.
 _GIRDI_BASLANGIC = "- [Örnek Ürün — test (CVE-2026-12345)](https://nvd.nist.gov/vuln/detail/CVE-2026-12345)"
 _ACIKLAMA_BASLANGIC = " — Üründe prompt injection"
 
@@ -75,7 +73,6 @@ class TestSozlesme(unittest.TestCase):
         self.assertIn("ONA02", _kimlikler("  https://ornek.example.com/yazi\n"))
 
     def test_ona02_satir_ortasinda_cipnak_link_yok(self):
-        # Sözleşmeye uyan bir girdinin açıklamasındaki URL ONA02 üretmemeli.
         self.assertNotIn("ONA02", _kimlikler(GECERLI))
 
     def test_girinti_ayristirma_alanlari(self):
@@ -125,12 +122,34 @@ class TestKurallar(unittest.TestCase):
         )
         self.assertNotIn("ONA04", _kimlikler(satir))
 
-    def test_ona04_urun_var_kimlik_yok_reddedilir(self):
+    def test_ona04_surum_beyani_ama_kimlik_yok_reddedilir(self):
         satir = (
             "- [Bazı Ürün — zafiyet](https://ornek.example.com/a) — Üründe veri "
             "sızdırma zafiyeti bulundu, 1.0 sürümü etkilendi. *(tür: araştırma, dil: EN)*"
         )
         self.assertIn("ONA04", _kimlikler(satir))
+
+    def test_ona04_kimligi_olan_urun_gecerli(self):
+        satir = (
+            "- [Bazı Ürün — zafiyet (CVE-2026-99999)](https://ornek.example.com/a) — "
+            "Üründe veri sızdırma zafiyeti bulundu, 1.0 sürümü etkilendi. "
+            "*(tür: araştırma, dil: EN)*"
+        )
+        self.assertNotIn("ONA04", _kimlikler(satir))
+
+    def test_ona04_cvesi_olmayacak_olay_gurultu_uretmez(self):
+        """Hukuki vaka, marka olayı veya derleme sayfası CVE taşımaz ve
+        taşıması da beklenmez. Sürüm beyanı yoksa ONA04 üretilmez."""
+        for ad, govde in [
+            ("Air Canada — chatbot'un hatalı tavsiyesinden sorumlu tutuldu",
+             "Mahkeme kararı verdi; kullanıcı zarar gördü. *(tür: vaka, dil: EN)*"),
+            ("DPD chatbot'unun küfretmesi ve kendi şirketini eleştirmesi",
+             "Kimlik ihlali yaşandı, şirket özür diledi. *(tür: vaka, dil: EN)*"),
+            ("The Month of AI Bugs 2025 (Wrap Up)",
+             "29 bulgu tek sayfada derlendi. *(tür: araştırma, dil: EN)*"),
+        ]:
+            satir = f"- [{ad}](https://ornek.example.com/a) — {govde}"
+            self.assertNotIn("ONA04", _kimlikler(satir), ad)
 
     def test_ona05_surum_yoksa_reddedilir(self):
         satir = (
